@@ -191,6 +191,7 @@ class ExecutiveStateEngine:
         proposal = self._email("email-call-reschedule-02")
         client_confirmation = self._email("email-call-reschedule-03")
         arjun_confirmation = self._email("email-call-reschedule-05")
+        voice_note = self._voice_note("voice-note-02")
         calendar_event = self._calendar_event("calendar-arjun-06")
         return ExecutiveItem(
             id="meridian-logistics-call",
@@ -215,6 +216,7 @@ class ExecutiveStateEngine:
                 self._email_ref(proposal),
                 self._email_ref(client_confirmation),
                 self._email_ref(arjun_confirmation),
+                self._voice_note_ref(voice_note),
                 self._calendar_ref(calendar_event),
             ],
         )
@@ -224,6 +226,7 @@ class ExecutiveStateEngine:
         revised = self._email("email-expense-variance-report-02")
         sent = self._email("email-expense-variance-report-04")
         acknowledged = self._email("email-expense-variance-report-05")
+        voice_note = self._voice_note("voice-note-02")
         return ExecutiveItem(
             id="expense-variance-report",
             title="July expense variance report",
@@ -247,6 +250,7 @@ class ExecutiveStateEngine:
                 self._email_ref(revised),
                 self._email_ref(sent),
                 self._email_ref(acknowledged),
+                self._voice_note_ref(voice_note),
             ],
         )
 
@@ -257,7 +261,7 @@ class ExecutiveStateEngine:
         return ExecutiveItem(
             id="mumbai-office-lease-renewal",
             title="Mumbai Office Lease Renewal signature",
-            status="unresolved",
+            status="pending",
             owner=None,
             ownership_status="unresolved",
             due=DueDate(date="2026-09-25", precision="end_of_day"),

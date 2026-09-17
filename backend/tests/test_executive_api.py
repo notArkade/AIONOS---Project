@@ -46,7 +46,7 @@ def test_unresolved_includes_mumbai_lease_with_source_metadata() -> None:
         for item in response.json()["unresolved_items"]
         if item["id"] == "mumbai-office-lease-renewal"
     )
-    assert lease["status"] == "unresolved"
+    assert lease["status"] == "pending"
     assert lease["ownership"] == "unresolved"
     assert lease["deadline"] == "2026-09-25"
     assert lease["sources"]

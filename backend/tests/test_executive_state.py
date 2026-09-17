@@ -49,6 +49,7 @@ def test_meridian_call_is_confirmed_and_matches_calendar(state: ExecutiveState) 
     source_ids = {reference.source_id for reference in meridian.source_references}
     assert "email-call-reschedule-03" in source_ids
     assert "email-call-reschedule-05" in source_ids
+    assert "voice-note-02" in source_ids
     assert "calendar-arjun-06" in source_ids
 
 
@@ -62,13 +63,14 @@ def test_expense_report_is_completed_and_not_open(state: ExecutiveState) -> None
     assert expense_report.due.precision == "evening"
     assert "6:00 PM" in expense_report.details[2]
     assert "6:10 PM" in expense_report.details[2]
+    assert "voice-note-02" in {reference.source_id for reference in expense_report.source_references}
     assert "expense-variance-report" not in {item.id for item in state.open_tasks}
 
 
 def test_lease_renewal_remains_unresolved_with_friday_eod_deadline(state: ExecutiveState) -> None:
     lease = find_item(state.unresolved_items, "mumbai-office-lease-renewal")
 
-    assert lease.status == "unresolved"
+    assert lease.status == "pending"
     assert lease.owner is None
     assert lease.ownership_status == "unresolved"
     assert lease.due is not None
