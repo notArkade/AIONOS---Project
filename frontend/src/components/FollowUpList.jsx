@@ -1,0 +1,3 @@
+export default function FollowUpList({ items = [], title = "Follow-ups" }) {
+  return <section className="mini-panel"><div className="section-heading"><h2>{title}</h2><span className="count-badge">{items.length}</span></div>{items.length ? items.slice(0, 4).map((item) => <div className="compact-item" key={item.id}><span className="priority-line" /><div><strong>{item.title}</strong><p>{item.owner || item.ownership}</p></div></div>) : <p className="empty-state">Nothing recorded.</p>}</section>;
+}

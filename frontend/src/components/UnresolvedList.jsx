@@ -1,0 +1,3 @@
+export default function UnresolvedList({ items = [] }) {
+  return <section className="mini-panel unresolved"><div className="section-heading"><h2>Unresolved items</h2><span className="count-badge">{items.length}</span></div>{items.length ? items.slice(0, 4).map((item) => <div className="compact-item" key={item.id}><span className="question-mark">?</span><div><strong>{item.title}</strong><p>{item.details?.[0] || "Responsibility or status is unresolved."}</p></div></div>) : <p className="empty-state">No unresolved items.</p>}</section>;
+}
