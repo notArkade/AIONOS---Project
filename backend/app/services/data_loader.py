@@ -27,7 +27,9 @@ class SourceDataLoader:
 
     def __init__(self, data_dir: Path | str | None = None) -> None:
         project_root = Path(__file__).resolve().parents[3]
-        self.data_dir = Path(data_dir) if data_dir is not None else project_root / "data"
+        deployment_data_dir = Path(__file__).resolve().parents[2] / "data"
+        default_data_dir = deployment_data_dir if deployment_data_dir.exists() else project_root / "data"
+        self.data_dir = Path(data_dir) if data_dir is not None else default_data_dir
 
     def load_all(self) -> SourceData:
         """Load every source file and return clean Pydantic objects."""

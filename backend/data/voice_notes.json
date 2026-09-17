@@ -1,0 +1,7 @@
+{
+  "source_metadata": {"source_type": "assignment_pdf", "source_reference": "Assignment 1 Data Pack, page 3, Voice Note Transcripts"},
+  "voice_notes": [
+    {"id":"voice-note-01","date":"2026-09-21","time":"18:40","speaker":"Arjun Malhotra","transcript":"Quick note to self — need to get Raghav that vendor list, I think I said today but it might slip to tomorrow morning, remind me. Also still haven’t heard back on the Mumbai lease thing, someone needs to own that, I don’t think it’s me.","context":"recorded in cab","source_type":"voice_note","source_reference":"PDF p. 3, Voice Note 1"},
+    {"id":"voice-note-02","date":"2026-09-23","time":"08:15","speaker":"Arjun Malhotra","transcript":"Reminder — expense variance report from Divya needs to be in my hands by Wednesday evening, not Thursday, I want time to go through it before board prep. Also Meridian call — I owe Priya a time, need to lock that in today.","source_type":"voice_note","source_reference":"PDF p. 3, Voice Note 2"}
+  ]
+}

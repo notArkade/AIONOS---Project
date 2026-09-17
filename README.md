@@ -87,7 +87,8 @@ implemented in the backend.
 │   ├── tests/                   # state, API, accuracy, and failure tests
 │   ├── requirements.txt
 │   └── requirements-dev.txt
-├── data/                        # fixed assignment JSON source data
+├── data/                        # canonical fixed assignment JSON source data
+├── backend/data/                # deployment-local copy for Vercel backend service
 ├── docs/
 │   ├── Assignment 1_DataPack_ExecutiveProductivityAgent.pdf
 │   ├── API_SPEC.md
@@ -116,6 +117,12 @@ The immutable source dataset is stored in `data/`:
 - `emails.json`: five email threads with five messages each
 - `voice_notes.json`: two personal voice-note transcripts
 - `people.json`: source participants and their roles
+
+The Vercel backend is deployed with `backend/` as its service root, so the
+same fixed JSON files are mirrored in `backend/data/` for packaging. The
+repository-root `data/` directory remains the canonical local source; the
+loader prefers the deployment-local copy when it exists and otherwise uses the
+root directory. Keep both copies synchronized if the assignment data changes.
 
 The loader validates every file with Pydantic before the state engine uses it.
 Every important derived item keeps source IDs and source references.
@@ -238,109 +245,6 @@ npm run build
 The suite covers state reconstruction, API contracts, assignment accuracy,
 malformed requests, missing Gemini configuration, Gemini failures/timeouts,
 malformed Gemini responses, fallbacks, and source preservation.
-
-## Deployment
-
-No deployment is performed automatically by this repository.
-
-### Vercel multi-service deployment
-
-The root `vercel.json` defines two services:
-
-- `frontend`: the Vite application under `frontend/`
-- `backend`: the FastAPI application under `backend/`, with entrypoint
-  `app/main.py`
-
-It rewrites `/api/*` to the backend service and all other routes to the
-frontend service.
-
-1. Import the repository into the Vercel project.
-2. Keep the project root at the repository root so Vercel can read
-  `vercel.json`.
-3. Set `GEMINI_API_KEY` and `GEMINI_MODEL` in the backend service environment.
-4. Set `CORS_ORIGINS` to the deployed Vercel origin if the platform sends an
-  origin header between services.
-5. Deploy and verify `/api/health`, `/api/dashboard`, and `/api/chat`.
-
-The frontend uses same-origin `/api` in this deployment, so no frontend API key
-or backend secret is exposed.
-
-### Separate backend on Render
-
-The root `render.yaml` provides a suitable web service blueprint:
-
-1. Create a new Render Blueprint from the GitHub repository.
-2. Review the service generated from `render.yaml`.
-3. Set `GEMINI_API_KEY` as a secret environment variable.
-4. Set `CORS_ORIGINS` to the final Vercel frontend URL.
-5. Deploy and verify `https://<render-host>/api/health`.
-
-The backend uses:
-
-```text
-Build: pip install -r requirements.txt
-Start: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-```
-
-Railway can use the same `backend` root directory, build command, start
-command, and environment variables.
-
-### Frontend on Vercel
-
-1. Import the GitHub repository into Vercel.
-2. Set the project root directory to `frontend`.
-3. Use the Vite build command and `dist` output directory.
-4. Set `VITE_API_URL` to the deployed backend URL.
-5. Deploy and verify the dashboard and chat request.
-6. Add the final Vercel origin to backend `CORS_ORIGINS` and redeploy the backend.
-
-The frontend is a static Vite build. No API key belongs in Vercel frontend
-environment variables.
-
-## Example Questions
-
-- What meetings do I have this week?
-- When is the campaign deck review?
-- Is the expense variance report still pending?
-- When is the Meridian call?
-- What's the status of the Mumbai lease?
-- Who is responsible for the Mumbai lease?
-- What do I need to follow up on?
-- Who is waiting on me?
-- What have I completed?
-- What is due Friday?
-- Prepare me for board prep.
-
-When the source data does not establish an answer, the agent says so. It does
-not assign unresolved responsibility.
-
-## Known Limitations
-
-- The dataset is static JSON from the assignment and is not live mailbox or
-  calendar data.
-- Gemini is optional; without a key, deterministic fallback answers are used.
-- No authentication or user-management system is implemented.
-- No writable tasks, memory, database, vector store, or background ingestion is
-  implemented.
-- Waiting-state collections are currently returned through the aggregate
-  dashboard endpoint.
-- The frontend loads Poppins from Google Fonts and falls back to Helvetica/system
-  fonts if that request is unavailable.
-- The initial deployment configuration targets Render/Railway for the backend
-  and Vercel for the frontend; cloud deployment must be configured by the
-  repository owner.
-
-## Screenshots / Demo
-
-Run the backend and frontend locally, then open `http://localhost:5173` to demo:
-
-1. Dashboard summary cards and executive overview
-2. Upcoming schedule and source-grounded commitments
-3. Completed tasks, deadlines, follow-ups, and unresolved ownership
-4. Chat quick actions and source references
-
-The responsive dashboard has been checked at desktop and 390px mobile widths.
-Screenshots can be added to this section after the final hosted URL is chosen.
 
 ## GitHub Repository Instructions
 
