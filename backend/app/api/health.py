@@ -1,15 +1,10 @@
 """Health-check endpoint."""
 
 from fastapi import APIRouter
-from pydantic import BaseModel
+
+from app.models.api import HealthResponse
 
 router = APIRouter(tags=["health"])
-
-
-class HealthResponse(BaseModel):
-    """Response returned by the API health check."""
-
-    status: str
 
 
 @router.get("/health", response_model=HealthResponse)
