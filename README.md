@@ -248,7 +248,8 @@ No deployment is performed automatically by this repository.
 The root `vercel.json` defines two services:
 
 - `frontend`: the Vite application under `frontend/`
-- `backend`: the FastAPI application under `backend/`
+- `backend`: the FastAPI application under `backend/`, with entrypoint
+  `app/main.py`
 
 It rewrites `/api/*` to the backend service and all other routes to the
 frontend service.
