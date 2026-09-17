@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.agent_service import AgentService
+from app.services.agent_service import AgentService, is_greeting
 from app.services.gemini_service import GeminiAnswer, GeminiServiceError
 
 
@@ -110,3 +110,61 @@ def test_waiting_on_others_is_explicitly_empty(agent: AgentService) -> None:
     assert response.related_items == []
     assert response.fallback_reason == "no_waiting_on_others"
     assert "does not establish anyone" in response.answer
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "hi", "Hello!", "  HEY  ", "hii", "hiii", "good morning", "Good afternoon!",
+        "good evening", "good night", "hi there", "hello assistant", "good morning assistant",
+        "how are you", "hope you're doing well", "greetings",
+    ],
+)
+def test_pure_greetings_are_detected(message: str) -> None:
+    assert is_greeting(message) is True
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "Good morning, what meetings do I have today?",
+        "Hi, what tasks are pending?",
+        "Hello, when is the campaign deck review?",
+        "Good morning, what do I need to prepare for tomorrow?",
+        "What is the status of the vendor list?",
+        "What meetings do I have on Thursday?",
+        "Who owns the Mumbai lease renewal?",
+        "Did Divya send the expense report?",
+        "",
+        "hi there please",
+    ],
+)
+def test_information_requests_are_not_greetings(message: str) -> None:
+    assert is_greeting(message) is False
+
+
+def test_pure_greeting_skips_state_and_gemini() -> None:
+    class FailingStateEngine:
+        def build(self):
+            raise AssertionError("pure greetings must not build executive state")
+
+    class FailingGemini:
+        def generate_answer(self, *args, **kwargs):
+            raise AssertionError("pure greetings must not call Gemini")
+
+    response = AgentService(
+        state_engine=FailingStateEngine(),  # type: ignore[arg-type]
+        gemini_service=FailingGemini(),  # type: ignore[arg-type]
+    ).answer("Good morning!")
+
+    assert response.answer == "Good morning, Arjun! How can I help you today?"
+    assert response.sources == []
+    assert response.related_items == []
+    assert response.fallback_reason == "greeting"
+
+
+def test_greeting_with_query_uses_normal_pipeline(agent: AgentService) -> None:
+    response = agent.answer("Hello, when is the campaign deck review?")
+
+    assert response.related_items[0].id == "q3-campaign-deck-review"
+    assert response.fallback_reason == "gemini_failure"

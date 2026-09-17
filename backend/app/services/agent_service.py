@@ -2,6 +2,7 @@
 
 from collections.abc import Iterable
 from datetime import date
+import re
 
 from pydantic import BaseModel
 
@@ -17,6 +18,35 @@ class AgentResponse(BaseModel):
     fallback_reason: str | None = None
 
 
+def _normalize_greeting(message: str) -> str:
+    cleaned = re.sub(r"[^\w\s']", " ", message.casefold())
+    return " ".join(cleaned.split())
+
+
+def is_greeting(message: str) -> bool:
+    """Return true only when the complete message is a conversational greeting."""
+    normalized = _normalize_greeting(message)
+    return bool(
+        re.fullmatch(r"(?:hi{1,4}|hello|hey)(?: there| assistant)?", normalized)
+        or re.fullmatch(r"good (?:morning|afternoon|evening|night)(?: assistant)?", normalized)
+        or normalized in {"how are you", "hope you're doing well", "greetings"}
+    )
+
+
+def greeting_response(message: str) -> str:
+    """Return a concise greeting without adding unsupported executive facts."""
+    normalized = _normalize_greeting(message)
+    if normalized.startswith("good morning"):
+        return "Good morning, Arjun! How can I help you today?"
+    if normalized.startswith("good afternoon"):
+        return "Good afternoon, Arjun! What would you like to work on?"
+    if normalized.startswith("good evening"):
+        return "Good evening, Arjun! How can I assist you?"
+    if normalized.startswith("good night"):
+        return "Good night, Arjun! How can I help?"
+    return "Hi, Arjun! How can I help?"
+
+
 class AgentService:
     """Retrieve source-grounded context, then optionally ask Gemini to phrase it."""
 
@@ -29,6 +59,14 @@ class AgentService:
         self.gemini_service = gemini_service or GeminiService()
 
     def answer(self, question: str) -> AgentResponse:
+        if is_greeting(question):
+            return AgentResponse(
+                answer=greeting_response(question),
+                sources=[],
+                related_items=[],
+                used_fallback=True,
+                fallback_reason="greeting",
+            )
         state = self.state_engine.build()
         if self._is_ambiguous(question):
             return AgentResponse(
