@@ -159,16 +159,17 @@ GEMINI_MODEL=gemini-2.5-flash
 CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ```
 
-For the frontend, copy `frontend/.env.example` to `frontend/.env` when the API
-is not running at its default URL:
+For local development, copy `frontend/.env.example` to `frontend/.env` so the
+Vite dev server calls the separately running backend:
 
 ```env
 VITE_API_URL=http://localhost:8000
 ```
 
-For production, set `VITE_API_URL` to the deployed backend URL, for example
-`https://executive-productivity-agent-api.onrender.com`. Set the backend
-`CORS_ORIGINS` to the deployed frontend origin.
+For the Vercel multi-service deployment, leave `VITE_API_URL` unset so the
+frontend calls same-origin `/api` routes through the root `vercel.json`
+rewrite. For separate Render/Railway backend hosting, set `VITE_API_URL` to
+the deployed backend URL and set backend `CORS_ORIGINS` to the frontend origin.
 
 ## Local Installation
 
@@ -242,7 +243,28 @@ malformed Gemini responses, fallbacks, and source preservation.
 
 No deployment is performed automatically by this repository.
 
-### Backend on Render
+### Vercel multi-service deployment
+
+The root `vercel.json` defines two services:
+
+- `frontend`: the Vite application under `frontend/`
+- `backend`: the FastAPI application under `backend/`
+
+It rewrites `/api/*` to the backend service and all other routes to the
+frontend service.
+
+1. Import the repository into the Vercel project.
+2. Keep the project root at the repository root so Vercel can read
+  `vercel.json`.
+3. Set `GEMINI_API_KEY` and `GEMINI_MODEL` in the backend service environment.
+4. Set `CORS_ORIGINS` to the deployed Vercel origin if the platform sends an
+  origin header between services.
+5. Deploy and verify `/api/health`, `/api/dashboard`, and `/api/chat`.
+
+The frontend uses same-origin `/api` in this deployment, so no frontend API key
+or backend secret is exposed.
+
+### Separate backend on Render
 
 The root `render.yaml` provides a suitable web service blueprint:
 
@@ -266,7 +288,7 @@ command, and environment variables.
 
 1. Import the GitHub repository into Vercel.
 2. Set the project root directory to `frontend`.
-3. Use the Vite defaults or the included `frontend/vercel.json`.
+3. Use the Vite build command and `dist` output directory.
 4. Set `VITE_API_URL` to the deployed backend URL.
 5. Deploy and verify the dashboard and chat request.
 6. Add the final Vercel origin to backend `CORS_ORIGINS` and redeploy the backend.
