@@ -113,6 +113,21 @@ def test_timeout_uses_deterministic_fallback() -> None:
     assert response.json()["fallback_reason"] == "timeout"
 
 
+def test_malformed_gemini_response_uses_deterministic_fallback() -> None:
+    override_agent(AgentService(gemini_service=FailingGemini(reason="invalid_response")))  # type: ignore[arg-type]
+    try:
+        response = client.post("/api/chat", json={"message": "When is the Meridian call?"})
+    finally:
+        clear_override()
+
+    body = response.json()
+    assert response.status_code == 200
+    assert body["used_fallback"] is True
+    assert body["fallback_reason"] == "invalid_response"
+    assert body["related_items"][0]["id"] == "meridian-logistics-call"
+    assert body["sources"]
+
+
 def test_no_relevant_data_does_not_call_gemini() -> None:
     response = AgentService(gemini_service=SuccessfulGemini()).answer("Tell me about quarterly product engineering")
 

@@ -1,4 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+const configuredUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_BASE_URL = configuredUrl.replace(/\/$/, "").endsWith("/api")
+  ? configuredUrl.replace(/\/$/, "")
+  : `${configuredUrl.replace(/\/$/, "")}/api`;
 
 async function request(path, options = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -22,6 +25,34 @@ async function request(path, options = {}) {
 
 export function getDashboard() {
   return request("/dashboard");
+}
+
+export function getSummary() {
+  return request("/summary");
+}
+
+export function getOpenTasks() {
+  return request("/tasks/open");
+}
+
+export function getCompletedTasks() {
+  return request("/tasks/completed");
+}
+
+export function getMeetings() {
+  return request("/meetings");
+}
+
+export function getDeadlines() {
+  return request("/deadlines");
+}
+
+export function getFollowUps() {
+  return request("/follow-ups");
+}
+
+export function getUnresolved() {
+  return request("/unresolved");
 }
 
 export function sendChatMessage(message) {

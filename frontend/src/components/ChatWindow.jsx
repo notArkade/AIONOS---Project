@@ -6,7 +6,7 @@ import LoadingState from "./LoadingState";
 const quickActions = ["What's on my calendar?", "What are my open tasks?", "Who is waiting on me?", "Who am I waiting on?", "What's urgent?", "Prepare me for board prep."];
 
 export default function ChatWindow() {
-  const [messages, setMessages] = useState([{ role: "assistant", content: "Good morning, Arjun. I can help you navigate your commitments, meetings, and follow-ups using the source data." }]);
+  const [messages, setMessages] = useState([{ role: "assistant", content: "Good morning, Arjun. I can help you navigate your commitments, meetings, and follow-ups using the source data.", timestamp: new Date().toISOString() }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -14,13 +14,13 @@ export default function ChatWindow() {
     const trimmed = message.trim();
     if (!trimmed || loading) return;
     setInput("");
-    setMessages((current) => [...current, { role: "user", content: trimmed }]);
+    setMessages((current) => [...current, { role: "user", content: trimmed, timestamp: new Date().toISOString() }]);
     setLoading(true);
     try {
       const response = await sendChatMessage(trimmed);
-      setMessages((current) => [...current, { role: "assistant", content: response.answer, sources: response.sources }]);
+      setMessages((current) => [...current, { role: "assistant", content: response.answer, sources: response.sources, timestamp: new Date().toISOString() }]);
     } catch (error) {
-      setMessages((current) => [...current, { role: "assistant", content: `I couldn't reach the assistant service. ${error.message}` }]);
+      setMessages((current) => [...current, { role: "assistant", content: `I couldn't reach the assistant service. ${error.message}`, timestamp: new Date().toISOString(), onRetry: () => submit(trimmed) }]);
     } finally {
       setLoading(false);
     }
