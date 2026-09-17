@@ -1,0 +1,14 @@
+{
+  "source_metadata": {
+    "source_type": "assignment_pdf",
+    "source_reference": "Assignment 1 Data Pack, page 1, People & Email Addresses"
+  },
+  "people": [
+    {"id": "arjun-malhotra", "name": "Arjun Malhotra", "role": "VP Sales", "email": "arjun.malhotra@veridian-corp.example", "is_application_user": true},
+    {"id": "neha-kapoor", "name": "Neha Kapoor", "role": "Marketing Lead", "email": "neha.kapoor@veridian-corp.example", "is_application_user": false},
+    {"id": "raghav-sethi", "name": "Raghav Sethi", "role": "Ops Manager", "email": "raghav.sethi@veridian-corp.example", "is_application_user": false},
+    {"id": "divya-rao", "name": "Divya Rao", "role": "Finance", "email": "divya.rao@veridian-corp.example", "is_application_user": false},
+    {"id": "priya-nair", "name": "Priya Nair", "role": "Meridian Logistics (external client)", "email": "priya.nair@meridianlogistics.example", "is_application_user": false},
+    {"id": "facilities", "name": "Facilities", "role": "Internal distribution list", "email": "facilities@veridian-corp.example", "is_application_user": false}
+  ]
+}
